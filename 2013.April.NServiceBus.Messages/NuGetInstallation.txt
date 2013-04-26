@@ -1,0 +1,1 @@
+﻿Install-Package NServiceBus.Interfaces -ProjectName 2013.April.NServiceBus.Messages
