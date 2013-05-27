@@ -1,0 +1,6 @@
+﻿Install-Dtc
+Install-Msmq
+Install-RavenDB
+Install-PerformanceCounters
+
+Install-Package NServiceBus -ProjectName 2013.April.NServiceBus.ClientConsole

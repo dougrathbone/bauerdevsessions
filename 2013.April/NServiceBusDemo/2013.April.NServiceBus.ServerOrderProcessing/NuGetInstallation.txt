@@ -1,0 +1,1 @@
+﻿Install-Package NServiceBus.Host -ProjectName 2013.April.NServiceBus.ServerOrderProcessing
