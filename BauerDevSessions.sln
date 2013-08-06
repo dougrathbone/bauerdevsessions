@@ -55,6 +55,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "2013.April.NServiceBus.Serv
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DemoUtils", "2013.04.April\NServiceBusDemo\DemoUtils\DemoUtils.csproj", "{A7A8E8A4-528C-4C48-A3C8-74340F1549A7}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2013-05 May", "2013-05 May", "{05929008-256C-4257-A82E-D115EA9FC34A}"
+	ProjectSection(SolutionItems) = preProject
+		2013.05.May\Readme.md = 2013.05.May\Readme.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
