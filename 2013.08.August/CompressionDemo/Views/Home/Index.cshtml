@@ -1,0 +1,39 @@
+﻿@{
+    ViewBag.Title = "Index";
+    ViewBag.SelectedNav = "Home";
+}
+
+<div class="container">
+<div class="row-fluid">
+    <div class="span12">
+        <div class="hero-unit">
+            <h1>Compression & Search Demos</h1>
+            <p></p>
+        </div>
+        <div class="row-fluid">
+            <div class="span4">
+                <h2>Run Length Encoding</h2>
+                <p></p>
+                <p>@Html.ActionLink("View details »","RunLengthEncoding", "Compression",null, new { @class = "btn" })</p>
+            </div><!--/span-->
+            <div class="span4">
+                <h2>Arithmetic Coding</h2>
+                <p></p>
+                <p>@Html.ActionLink("View details »","ArithmeticCoding", "Compression",null, new { @class = "btn" })</p>
+            </div><!--/span-->
+            <div class="span4">
+                <h2>Static Huffman Code</h2>
+                <p></p>
+                <p>@Html.ActionLink("View details »","StaticHuffmanCode", "Compression",null, new { @class = "btn" })</p>
+            </div><!--/span-->
+        </div><!--/row-->
+        <div class="row-fluid">
+            <div class="span4">
+                <h2>Lempel-Ziv-Welch (LZW)</h2>
+                <p></p>
+                <p>@Html.ActionLink("View details »","Lzw", "Compression",null, new { @class = "btn" })</p>
+            </div><!--/span-->
+        </div> <!--/row-->
+    </div> <!--/span-->
+</div>
+    </div>

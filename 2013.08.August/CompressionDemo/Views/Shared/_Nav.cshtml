@@ -1,0 +1,13 @@
+﻿@{
+    var activeClass = "active";
+    var homeClass = ViewBag.SelectedNav != "Compression" && ViewBag.SelectedNav != "Search" ? activeClass : string.Empty;
+    var compressionClass = ViewBag.SelectedNav == "Compression" ? activeClass : string.Empty;
+    var searchClass = ViewBag.SelectedNav == "Search" ? activeClass : string.Empty;
+}
+
+<ul class="nav">
+    <li class="@homeClass">@Html.ActionLink("Home", "Index", "Home")</li>
+    <li class="@compressionClass">@Html.ActionLink("Compression", "Index", "Compression")</li>
+    <li class="@searchClass">@Html.ActionLink("Search", "Index", "Search")</li>
+    <li class="@searchClass">@Html.ActionLink("Slides", "Index", "Slide")</li>
+</ul>
