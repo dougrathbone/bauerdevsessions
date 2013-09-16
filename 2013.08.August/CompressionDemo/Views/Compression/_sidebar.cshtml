@@ -1,0 +1,20 @@
+﻿@{
+    var list = new Dictionary<string, string>() {
+        { "Run Length Encoding", "RunLengthEncoding"},
+        { "Arithmetic Coding","ArithmeticCoding" },
+        { "Static Huffman Code","StaticHuffmanCode" },
+        { "Lempel-Ziv-Welch","Lzw" }
+    };
+}
+
+<div class="span3">
+    <div class="well sidebar-nav">
+        <ul class="nav nav-list">
+            <li class="nav-header">Compression Demos</li>
+            @foreach (var item in list)
+            {
+                <li class="@(item.Key==ViewBag.Title?"active":"")">@Html.ActionLink(item.Key,item.Value,"Compression")</li>
+            }
+        </ul>
+    </div><!--/.well -->
+</div><!--/span-->

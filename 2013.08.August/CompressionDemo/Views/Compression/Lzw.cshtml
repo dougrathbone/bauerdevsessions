@@ -1,0 +1,294 @@
+﻿@{
+    ViewBag.Title = "Lempel-Ziv-Welch";
+    ViewBag.SelectedNav = "Compression";
+}
+
+<div class="container-fluid">
+    <div class="row-fluid">
+        @Html.Partial("_sidebar")
+
+        <div class="span9">
+            <div class="hero-unit">
+                <h1>Lempel-Ziv-Welch (LZW) Algorithm</h1><br />
+                <div class="row-fluid lead">
+                </div>
+                <div class="row-fluid" id="pseudo">
+<pre class="span4">
+w = NIL
+while ( read a character k ) { 
+    if wk exists in the dictionary
+        w = wk
+    else {
+        add wk to the dictionary
+        output the code for w
+        w = k
+    }
+}
+</pre>
+                </div>
+            </div>
+            <div class="row-fluid">
+                <div class="well">
+                    <div id="span9 input">
+                        Enter text to compress.<br />
+                        <input id="text" type="text" value="^WED^WE^WEE^WEB^WET" />
+                        <button id="compress" class="btn btn-primary">Compress</button>
+                    </div>
+                    <div id="debug" class="hidden">
+                        <button id="next" class="btn btn-success">Next Step</button>
+                        <button class="btn btn-info" id="skip">Skip <i class="icon-play icon-white"></i></button>
+                        <div id="container-cursor"></div>
+                        <div class="row-fluid">
+                            <div id="container-dictionary" class="span4"></div>
+                        </div>                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Css {
+    @Styles.Render("~/Content/jquerytable")
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryui")
+    @Scripts.Render("~/bundles/jquerytable")
+    @Scripts.Render("~/bundles/demo")
+    
+    <script defer="defer">
+        $(document).ready(function () {
+            document.getElementById('compress').addEventListener('click', function () {
+                window.Compression.Demo.UI.Lzw.init({ text: document.getElementById('text').value, stage: 'container-cursor', height: '200', width: '500' });
+                document.getElementById('debug').classList.remove('hidden');
+            });
+
+            document.getElementById('next').addEventListener('click', function () {
+                window.Compression.Demo.UI.Lzw.next();
+            });
+
+            document.getElementById('skip').addEventListener('click', function () {
+                window.Compression.Demo.UI.Lzw.complete();
+            });
+        });
+    </script>
+
+    <script defer="defer">
+        (function (ui, $, undefined) {
+            (function (lzw, $, undefined) {
+                var self = lzw;
+                var dictionaryTable;
+                var context;
+                var stage;
+                var textLayer;
+                var cursor;
+                var output;
+
+                self.init = function (options) {
+                    buildDictionaryTable('container-dictionary');
+
+                    dictionary = [];
+                    output = '';
+                    context = new Compression.Demo.Lzw.Context({ text: options.text });
+
+                    stage = new Kinetic.Stage({
+                        container: options.stage,
+                        width: options.width,
+                        height: options.height
+                    });
+
+                    textLayer = new Kinetic.Layer();
+
+                    // add the layer to the stage
+                    stage.add(textLayer);
+                    self.draw();
+                };
+
+                self.draw = function () {
+                    var TitleText1 = new Kinetic.Text({
+                        x: 20,
+                        y: 20,
+                        text: "Original String",
+                        fontSize: 24,
+                        fontFamily: 'Calibri',
+                        fill: 'black'
+                    });
+
+                    var originalText = new Kinetic.Text({
+                        y: 60,
+                        x: 20,
+                        text: context.text,
+                        fontSize: 24,
+                        fontFamily: 'Calibri',
+                        fill: 'green'
+                    });
+
+                    var TitleText2 = new Kinetic.Text({
+                        y: 100,
+                        x: 20,
+                        text: "Encoded String",
+                        fontSize: 24,
+                        fontFamily: 'Calibri',
+                        fill: 'black'
+                    });
+
+                    var encodedText = new Kinetic.Text({
+                        y: 140,
+                        x: 20,
+                        text: output,
+                        fontSize: 24,
+                        fontFamily: 'Calibri',
+                        fill: 'green'
+                    });
+
+                    // add the shape to the layer
+                    textLayer.add(TitleText1);
+                    textLayer.add(originalText);
+                    textLayer.add(TitleText2);
+                    textLayer.add(encodedText);
+
+                    if (context && context.position >= 0) {
+                        if (!cursor) {
+                            cursor = new Kinetic.Rect({
+                                x: originalText.getX() - originalText.getOffsetX() - 2,
+                                y: originalText.getY() - originalText.getOffsetY(),
+                                width: originalText.getWidth() / originalText.getText().length + 3,
+                                height: originalText.getTextHeight() + 3,
+                                stroke: 'red',
+                                strokeWidth: 2
+                            });
+
+                            setCursorWidth(cursor, context.text[context.position]);
+                            textLayer.add(cursor);
+                            completed();
+                        } else {
+                            var tween = new Kinetic.Tween({
+                                node: cursor,
+                                x: cursor.getX() + cursor.getWidth() - 2,
+                                y: originalText.getY() - 3,
+                                easing: Kinetic.Easings.EaseInOut,
+                                duration: 1,
+                                onFinish: function () {
+                                    setCursorWidth(cursor, context.text[context.position]);
+                                    completed();
+                                }
+                            });
+
+                            tween.play();
+                        }
+                    }
+
+                    if (context.output) {
+                        var outputText = new Kinetic.Text({
+                            x: encodedText.getX() + encodedText.getWidth(),
+                            y: encodedText.getY(),
+                            text: context.output,
+                            opacity: 0,
+                            fontSize: 24,
+                            fontFamily: 'Calibri',
+                            fill: 'green'
+                        });
+
+                        textLayer.add(outputText);
+
+                        var tween = new Kinetic.Tween({
+                            node: outputText,
+                            x: encodedText.getX() + encodedText.getWidth(),
+                            y: encodedText.getY(),
+                            easing: Kinetic.Easings.EaseInOut,
+                            duration: 2,
+                            opacity: 1,
+                            onFinish: function () {
+                                encodedText.setText(context.outputText);
+                                //encodedText.setWidth(getTextWidth(context.outputText));
+                                output = context.outputText;
+                                outputText.destroy();
+                                textLayer.draw();
+                                completed();
+                            }
+                        });
+
+                        tween.play();
+                    }
+
+                    textLayer.draw();
+                }
+
+                self.next = function () {
+                    document.getElementById('next').disabled = true;
+                    Compression.Demo.Lzw.encode(context);
+                    self.draw();
+                    addToDictionary(context);                    
+                };
+
+                self.complete = function () {
+                    while (!context.complete) {
+                        Compression.Demo.Lzw.encode(context);
+                        addToDictionary(context);
+                    }
+                    output = context.outputText;
+                    context.output = '';
+                    self.draw();
+                };
+                
+                var addToDictionary = function (context) {
+                    var output = '';
+                    var index = '';
+                    var code ='';
+
+                    if (context.output) {
+                        output = context.output;
+                        index = context.dictionary[context.symbol];
+                        code = context.symbol;
+                    }
+
+                    if (context.complete)
+                        index = '';
+
+                    dictionaryTable.fnAddData([context.w, context.k, output, index, code]);
+                };
+                
+                var buildDictionaryTable = function (container) {
+                    var id = container + "-dictionary";
+                    $('#' + container).html('<table cellpadding="0" cellspacing="0" border="0" class="display" id="' + id + '"></table>');
+                    dictionaryTable = $('#' + id).dataTable({
+                        "sDom": "rt",
+                        "bPaginate": false,
+                        "bSort": false,
+                        "aoColumns": [
+                            { "sTitle": "w" },
+                            { "sTitle": "k" },
+                            { "sTitle": "output" },
+                            { "sTitle": "index" },
+                            { "sTitle": "symbol" }
+                        ]
+                    });
+                };
+
+                var completed = function () {
+                    document.getElementById('next').disabled = context.complete;
+                    if (context.complete) {
+                        cursor.destroy();
+                    }
+                }
+
+                var setCursorWidth = function (cursor, text) {
+                    cursor.setWidth(getTextWidth({ text: text }) + 2);
+                };
+
+                var getTextWidth = function (opts) {
+                    opts = $.extend({}, { text: '', fontSize: 24, fontFamily: 'Calibri' }, opts);
+
+                    var symbol = new Kinetic.Text({
+                        text: opts.text,
+                        fontSize: opts.fontSize,
+                        fontFamily: opts.fontFamily
+                    });
+
+                    return symbol.getTextWidth();
+                }
+            })(ui.Lzw = ui.Lzw || {}, $);
+        })(window.Compression.Demo.UI = window.Compression.Demo.UI || {}, jQuery);
+    </script>
+}

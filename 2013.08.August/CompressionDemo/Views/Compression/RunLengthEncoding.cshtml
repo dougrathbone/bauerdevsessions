@@ -1,0 +1,194 @@
+﻿@{
+    ViewBag.Title = "Run Length Encoding";
+    ViewBag.SelectedNav = "Compression";
+}
+
+<div class="container-fluid">
+    <div class="row-fluid">
+        @Html.Partial("_sidebar")
+
+        <div class="span9">
+            <div class="hero-unit">
+                <h1>Run Length Encoding</h1>
+                <p>
+                    Run-length coding (encoding) is a very widely used and simple compression technique 
+                </p>
+                <ul>
+                    <li>does not assume a memoryless source</li>
+                    <li>replace runs of symbols (possibly of length one) with pairs of (symbol, run-length)</li>
+                </ul>
+            </div>
+            <div class="row-fluid">
+                <div class="well">
+                <div id="span9 input">
+                    <input id="text" type="text" value="aaaawwwwwjhheee" />
+                    <button id="encode" class="btn btn-primary">Encode</button>
+                </div>
+                <div>
+                    <button id="next" disabled class="hidden btn btn-success">Next Step</button>
+                </div>
+                <div id="container"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/demo")
+    <script defer="defer">
+        var context;
+        var title1Text;
+        var originalText;
+        var cursor;
+
+        var stage = new Kinetic.Stage({
+            container: 'container',
+            width: 578,
+            height: 200
+        });
+
+        var orginalLayer = new Kinetic.Layer();
+        var encodedLayer = new Kinetic.Layer();
+
+        // add the layer to the stage
+        stage.add(orginalLayer);
+        stage.add(encodedLayer);
+        stage.hide();
+
+        // add button event bindings
+        document.getElementById('encode').addEventListener('click', function () {
+            stage.hide();
+            orginalLayer.clear();
+            encodedLayer.clear();
+
+            var text = document.getElementById('text').value;
+
+            context = new Compression.Demo.RunLengthEncoding.Context({ text: text });
+
+            title1Text = new Kinetic.Text({
+                x: stage.getWidth() / 2,
+                y: 15,
+                text: 'Original String',
+                fontSize: 30,
+                fontFamily: 'Calibri',
+                fill: 'black',
+                fontDecoration: 'underline'
+            });
+
+            originalText = new Kinetic.Text({
+                x: stage.getWidth() / 2,
+                y: 60,
+                text: text,
+                fontSize: 24,
+                fontFamily: 'Calibri',
+                fill: 'green'
+            });
+
+
+            // to align text in the middle of the screen, we can set the
+            // shape offset to the center of the text shape after instantiating it
+            title1Text.setOffset({
+                x: title1Text.getWidth() / 2
+            });
+
+            originalText.setOffset({
+                x: originalText.getWidth() / 2
+            });
+
+            encodedText = new Kinetic.Text({
+                x: originalText.getX() - originalText.getOffsetX(),
+                y: 100,
+                text: '',
+                fontSize: 24,
+                fontFamily: 'Calibri',
+                fill: 'green'
+            });
+
+            // add the shape to the layer
+            orginalLayer.add(title1Text);
+            orginalLayer.add(originalText);
+            encodedLayer.add(encodedText);
+
+            stage.show();
+            orginalLayer.draw();
+            encodedLayer.draw();
+
+            document.getElementById('next').classList.remove('hidden');
+            document.getElementById('next').disabled = false;
+        }, false);
+
+        document.getElementById('next').addEventListener('click', function () {
+            document.getElementById('next').disabled = true;
+
+            Compression.Demo.RunLengthEncoding.encode(context);
+
+            if (!cursor) {
+                cursor = new Kinetic.Rect({
+                    x: originalText.getX() - originalText.getOffsetX() - 3,
+                    y: originalText.getY() - originalText.getOffsetY(),
+                    width: originalText.getWidth() / originalText.getText().length + 3,
+                    height: originalText.getTextHeight() + 3,
+                    stroke: 'red',
+                    strokeWidth: 2
+                });
+
+                orginalLayer.add(cursor);
+            }
+
+            if (context.position > 1 && (context.count == 1 || context.complete)) {
+                // complete run for current symbol found
+                var runText = context.text.substring(context.run.start, context.run.start + context.run.count);
+                var run = new Kinetic.Text({
+                    x: cursor.getX() + 6,
+                    y: 60,
+                    text: runText,
+                    fontSize: 24,
+                    fontFamily: 'Calibri',
+                    fill: 'red'
+                });
+
+                orginalLayer.add(run);
+                orginalLayer.draw();
+
+                var tween = new Kinetic.Tween({
+                    node: run,
+                    x: encodedText.getX() + encodedText.getWidth(),
+                    y: 100,
+                    easing: Kinetic.Easings.EaseInOut,
+                    duration: 2,
+                    onFinish: function () {
+                        run.destroy();
+                        encodedText.setText(encodedText.getText() + context.run.output);
+                        encodedLayer.draw();
+                        cursor.setX(cursor.getX() + cursor.getWidth() - 2);
+                        setCursor(cursor, context);
+                        document.getElementById('next').disabled = context.complete;
+                        if (context.complete) {
+                            cursor.destroy();
+                        }
+                    }
+                });
+
+                tween.play();
+                return;
+            }
+
+            setCursor(cursor, context);
+
+            document.getElementById('next').disabled = false;
+        });
+
+        function setCursor(cursor, context) {
+            var symbol = new Kinetic.Text({
+                text: context.prev,
+                fontSize: 24,
+                fontFamily: 'Calibri'
+            });
+
+            cursor.setWidth(symbol.getTextWidth() * context.count + 3);
+
+            orginalLayer.draw();
+        }
+    </script>
+}

@@ -1,0 +1,358 @@
+﻿@{
+    ViewBag.Title = "Arithmetic Coding";
+    ViewBag.SelectedNav = "Compression";
+}
+
+<div class="container-fluid">
+    <div class="row-fluid">
+        @Html.Partial("_sidebar")
+
+        <div class="span9">
+            <div class="hero-unit">
+                <h1>Arithmetic Coding</h1>
+            </div>
+            <div class="row-fluid fuelux">
+
+                <div class="well">
+                    <div id="MyWizard" class="wizard">
+                        <ul class="steps">
+                            <li data-target="#step1" class="active"><span class="badge badge-info">1</span>Step 1<span class="chevron"></span></li>
+                            <li data-target="#step2"><span class="badge">2</span>Step 2<span class="chevron"></span></li>
+                            <li data-target="#step3"><span class="badge">3</span>Step 3<span class="chevron"></span></li>
+                            <li data-target="#step4"><span class="badge">4</span>Step 4<span class="chevron"></span></li>
+                        </ul>
+                    </div>
+                    <div class="step-content">
+                        <div class="step-pane active" id="step1">
+                            <h2>Enter word to encode</h2>
+                            Enter text that you would like to encode<br>
+                            <input type="text" id="sampleText" value="Bill Gates" /><br>
+                            Click 'Next' to continue.
+                        </div>
+                        <div class="step-pane" id="step2">
+                            <h2>Adjust symbol probability</h2>
+                            Adjust the probability of symbols, if you like. By default it is evenly distributed<br>
+                            <div id="container"></div>
+                        </div>
+                        <div class="step-pane" id="step3">
+                            <h2>Encode text</h2>
+                            <div id="row-fluid container-pseudo">
+                                <pre class="span4">Set low to 0.0
+Set high to 1.0
+While there are still input symbols do
+    get an input symbol
+    code_range = high - low
+    high = low + code_range * high(symbol)
+    low = low + code_range * low(symbol)
+End of While
+output low or a number within the range</pre>
+                            </div>
+                            <div class="row-fluid">
+                                <div id="container-table" class="span8"></div>
+                            </div>
+                            <button class="btn btn-success" id="next-step3">Step <i class="icon-forward icon-white"></i></button>
+                            <button class="btn btn-info" id="next-skip3">Skip <i class="icon-play icon-white"></i></button>
+                            <div id="container-cursor" class="row-fluid"></div>
+                            <div id="container-result" class="row-fluid"></div>
+                        </div>
+                        <div class="step-pane" id="step4">
+                            <h2>Done</h2>
+                            <p class="lead">Any number between <strong class="low"></strong> - <strong class="high"></strong> can represent the text and be decoded!</p>
+                        </div>
+                    </div>
+                    <br>
+                    <input type="button" class="btn" id="btnWizardPrev" value="Back">
+                    <input type="button" class="btn btn-primary" id="btnWizardNext" value="Next">
+                </div>
+                <!-- /well -->
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Css {
+    @Styles.Render("~/Content/jquerytable")
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryui")
+    @Scripts.Render("~/bundles/jquerytable")
+    @Scripts.Render("~/bundles/fuelux")
+    @Scripts.Render("~/bundles/demo")
+    <script defer="defer">
+        $(document).ready(function () {
+            $('#MyWizard').on('change', function (e, data) {
+                if (data.step === 1 && data.direction === 'next') {
+                    window.Compression.Demo.UI.ArithmeticCode.init({ text: document.getElementById('sampleText').value });
+                } else if (data.step === 2 && data.direction === 'next') {
+                    document.getElementById('btnWizardNext').classList.add('hidden');
+                    window.Compression.Demo.UI.ArithmeticCode.buildSymbolTable('container-table', false);
+                    window.Compression.Demo.UI.ArithmeticCode.buildEncodingTable('container-result');
+                    window.Compression.Demo.UI.ArithmeticCode.cursorInit({ container: 'container-cursor', height: '60', width: '570' });
+                } else if (data.step === 3 && data.direction === 'next') {
+                    window.Compression.Demo.UI.ArithmeticCode.updateFinalValues($('strong.low'), $('strong.high'));
+                }
+
+                if (data.direction === 'prev') {
+                    document.getElementById('btnWizardNext').classList.remove('hidden');
+                }
+            });
+            
+            $('#btnWizardPrev').on('click', function () {
+                $('#MyWizard').wizard('previous');
+            });
+            $('#btnWizardNext').on('click', function () {
+                $('#MyWizard').wizard('next');
+            });
+            $('#btnWizardStep').on('click', function () {
+                var item = $('#MyWizard').wizard('selectedItem');
+            });
+            $('#MyWizard').on('stepclick', function (e, data) {
+                console.log('step' + data.step + ' clicked');
+                if (data.step === 1) {
+                    // return e.preventDefault();
+                }
+            });
+
+            document.getElementById('next-step3').addEventListener('click', function () {
+                window.Compression.Demo.UI.ArithmeticCode.next();
+            });
+
+            document.getElementById('next-skip3').addEventListener('click', function () {
+                window.Compression.Demo.UI.ArithmeticCode.continue();
+            });
+        });
+    </script>
+
+    <script defer="defer">
+        (function (ui, $, undefined) {
+            (function (arithmeticCode, $, undefined) {
+                var self = arithmeticCode;
+                var context;
+                var table;
+                var encodeTable;
+                var stage;
+                var textLayer;
+                var cursor;
+
+                self.init = function (opts) {
+                    var tmp = [];
+                    table = {};
+
+                    opts = $.extend({}, { text: '' }, opts);
+
+                    for (var i = 0; i < opts.text.length; i++) {
+                        if (tmp.indexOf(opts.text[i]) < 0) {
+                            tmp.push(opts.text[i]);
+                        }
+                    }
+
+                    tmp.sort();
+
+                    var codeRange = 1 / tmp.length;
+                    var low = 0;
+                    var high = codeRange;
+                    for (var i = 0; i < tmp.length; i++) {
+                        table[tmp[i]] = { low: low, high: high };
+                        low = high;
+                        high += codeRange;
+                        high = Math.min(high, 1);
+                    }
+
+                    context = new Compression.Demo.ArithmeticCoding.Context({ text: opts.text, table: table });
+                    self.buildSymbolTable('container', true);
+                };
+
+                self.cursorInit = function (opts) {
+                    stage = new Kinetic.Stage({
+                        container: opts.container,
+                        width: opts.width,
+                        height: opts.height
+                    });
+
+                    textLayer = new Kinetic.Layer();
+
+                    // add the layer to the stage
+                    stage.add(textLayer);
+                    self.draw();
+                }
+
+                self.draw = function () {
+                    var originalText = new Kinetic.Text({
+                        x: 20,
+                        y: 20,
+                        text: context.text,
+                        fontSize: 24,
+                        fontFamily: 'Calibri',
+                        fill: 'green'
+                    });
+                    
+                    // add the shape to the layer
+                    textLayer.add(originalText);
+
+                    if (context && context.position >= 0) {
+                        if (!cursor) {
+                            cursor = new Kinetic.Rect({
+                                x: originalText.getX() - originalText.getOffsetX() - 2,
+                                y: originalText.getY() - originalText.getOffsetY(),
+                                width: originalText.getWidth() / originalText.getText().length + 3,
+                                height: originalText.getTextHeight() + 3,
+                                stroke: 'red',
+                                strokeWidth: 2
+                            });
+
+                            setCursorWidth(cursor, context.text[context.position]);
+                            textLayer.add(cursor);
+                        } else {
+                            var tween = new Kinetic.Tween({
+                                node: cursor,
+                                x: cursor.getX() + cursor.getWidth() - 2,
+                                y: originalText.getY() - 3,
+                                easing: Kinetic.Easings.EaseInOut,
+                                duration: 1,
+                                onFinish: function () {
+                                    setCursorWidth(cursor, context.text[context.position]);
+                                }
+                            });
+
+                            tween.play();
+                        }
+                    }
+
+                    textLayer.draw();
+                }
+
+                self.buildSymbolTable = function (container, editable) {
+                    var data = [];
+                    for (var symbol in table) {
+                        var tmp = symbol;
+                        if (tmp == " ")
+                            tmp = "SPACE";
+
+                        data.push([tmp, table[symbol].low, table[symbol].high]);
+                    }
+
+                    var id = container + "-symbolTable";
+                    $('#' + container).html('<table cellpadding="0" cellspacing="0" border="0" class="display" id="' + id + '"></table>');
+                    var dataTable = $('#' + id).dataTable({
+                        "sDom": "rt",
+                        "bPaginate": false,
+                        "bSort": false,
+                        "aaData": data,
+                        "aoColumns": [
+                            { "sTitle": "Symbol" },
+                            { "sTitle": "Low" },
+                            { "sTitle": "High" },
+                        ]
+                    });
+
+                    if (editable) {
+                        /* Apply the jEditable handlers to the table */
+                        dataTable.$('td:not(:first-child)').editable(function (value, settings) {
+                            console.log(this);
+                            var low; var high;
+                            var pos = dataTable.fnGetPosition(this);
+                            var row = dataTable.fnGetData(pos[0]);
+
+                            updateTable(row[0], value, pos[1] == 1);
+
+                            if (pos[1] == 1 && pos[0] - 1 >= 0) {
+                                var prevRow = dataTable.fnGetData(pos[0] - 1);
+                                updateTable(prevRow[0], value, false);
+                            } else if (pos[0] + 1 < dataTable.fnGetData().length) {
+                                var nextRow = dataTable.fnGetData(pos[0] + 1);
+                                updateTable(nextRow[0], value, true);
+                            }
+
+                            return (value);
+                        }, {
+                            "callback": function (value, y) {
+                                var pos = dataTable.fnGetPosition(this);
+                                dataTable.fnUpdate(value, pos[0], pos[1]);
+
+                                if (pos[1] == 1 && pos[0] - 1 >= 0) {
+                                    dataTable.fnUpdate(value, pos[0] - 1, pos[1] + 1);
+                                } else if (pos[0] + 1 < dataTable.fnGetData().length) {
+                                    dataTable.fnUpdate(value, pos[0] + 1, pos[1] - 1);
+                                }
+                            },
+                            "height": "14px",
+                            "width": "200px"
+                        });
+                    }
+                };
+
+                self.buildEncodingTable = function (container) {
+                    var id = container + "-encodingTable";
+                    $('#' + container).html('<table cellpadding="0" cellspacing="0" border="0" class="display" id="' + id + '"></table>');
+                    encodeTable = $('#' + id).dataTable({
+                        "sDom": "rt",
+                        "bPaginate": false,
+                        "bSort": false,
+                        "aoColumns": [
+                            { "sTitle": "New Symbol" },
+                            { "sTitle": "Low" },
+                            { "sTitle": "High" },
+                        ]
+                    });
+                };
+
+                self.next = function () {
+                    document.getElementById('next-step3').disabled = true;
+                    Compression.Demo.ArithmeticCoding.encode(context);
+                    self.draw();
+                    encodeTable.fnAddData([context.symbol, context.low, context.high]);
+                    complete();
+                };
+
+                self.continue = function () {
+                    document.getElementById('next-step3').disabled = true;
+                    while (!context.complete) {
+                        Compression.Demo.ArithmeticCoding.encode(context);
+                        encodeTable.fnAddData([context.symbol, context.low, context.high]);
+                    }
+                    self.draw();
+                    complete();
+                };
+
+                self.updateFinalValues = function(low, high) {
+                    low.html(context.low);
+                    high.html(context.high);
+                }
+
+                function updateTable(symbol, value, updateLow) {
+                    symbol = symbol == "SPACE" ? " " : symbol;
+
+                    if (updateLow)
+                        table[symbol].low = value;
+                    else
+                        table[symbol].high = value;
+                }
+
+                var complete = function () {
+                    document.getElementById('next-step3').disabled = context.complete;
+                    if (context.complete) {
+                        cursor.destroy();
+                        document.getElementById('btnWizardNext').classList.remove('hidden');
+                    }
+                }
+
+                var setCursorWidth = function (cursor, text) {
+                    cursor.setWidth(getTextWidth({ text: text }) + 2);
+                };
+
+                var getTextWidth = function (opts) {
+                    opts = $.extend({}, { text: '', fontSize: 24, fontFamily: 'Calibri' }, opts);
+
+                    var symbol = new Kinetic.Text({
+                        text: opts.text,
+                        fontSize: opts.fontSize,
+                        fontFamily: opts.fontFamily
+                    });
+
+                    return symbol.getTextWidth();
+                }
+            })(ui.ArithmeticCode = ui.ArithmeticCode || {}, $);
+        })(window.Compression.Demo.UI = window.Compression.Demo.UI || {}, jQuery);
+    </script>
+}
