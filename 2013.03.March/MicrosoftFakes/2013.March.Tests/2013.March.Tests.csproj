@@ -62,7 +62,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\2013.March.Domain\2013.March.Domain.csproj">
+    <ProjectReference Include="..\..\EFCodeFirst\2013.March.Domain\2013.March.Domain.csproj">
       <Project>{DE0AA68F-D0A4-44E4-9B11-1D75A78B40E8}</Project>
       <Name>2013.March.Domain</Name>
     </ProjectReference>
