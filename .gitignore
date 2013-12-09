@@ -47,7 +47,8 @@ _ReSharper*/
 # Office Temp Files
 ~$*
 
-#NuGet
+#Nuget packages
+packages/*
 
 Ninja.Database/Ninja.Database.dbmdl
 Ninja.Database/Ninja.Database.dbproj.schemaview
