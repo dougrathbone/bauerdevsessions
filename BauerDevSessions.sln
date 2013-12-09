@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2013-03 March", "2013-03 March", "{AF0024DC-1391-4B36-9B3A-366CFBE8AC39}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "2013.March.Data", "2013.March.Data\2013.March.Data.csproj", "{8A2700ED-DAD7-42E1-B4FA-2B873A8EA87C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "2013.March.Data", "2013.03.March\EFCodeFirst\2013.March.Data\2013.March.Data.csproj", "{8A2700ED-DAD7-42E1-B4FA-2B873A8EA87C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "2013.March.Tests", "2013.March.Tests\2013.March.Tests.csproj", "{174ECAC1-D805-4F7D-9947-8FEDE6D5797C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "2013.March.Tests", "2013.03.March\MicrosoftFakes\2013.March.Tests\2013.March.Tests.csproj", "{174ECAC1-D805-4F7D-9947-8FEDE6D5797C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "2013.March.Domain", "2013.March.Domain\2013.March.Domain.csproj", "{DE0AA68F-D0A4-44E4-9B11-1D75A78B40E8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "2013.March.Domain", "2013.03.March\EFCodeFirst\2013.March.Domain\2013.March.Domain.csproj", "{DE0AA68F-D0A4-44E4-9B11-1D75A78B40E8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "2013.March.RunMe", "2013.March.RunMe\2013.March.RunMe.csproj", "{144E041C-4417-4E85-BC42-47F794FA89C0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "2013.March.RunMe", "2013.03.March\EFCodeFirst\2013.March.RunMe\2013.March.RunMe.csproj", "{144E041C-4417-4E85-BC42-47F794FA89C0}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EF Code First", "EF Code First", "{7248CFEA-804B-4B97-BF8D-9DCF1EE36E5D}"
 EndProject
@@ -57,7 +57,21 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DemoUtils", "2013.04.April\
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2013-05 May", "2013-05 May", "{05929008-256C-4257-A82E-D115EA9FC34A}"
 	ProjectSection(SolutionItems) = preProject
-		2013.05.May\Readme.md = 2013.05.May\Readme.md
+		2013.05.May\SignalR-TankWar.md = 2013.05.May\SignalR-TankWar.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2013-08 August", "2013-08 August", "{0B684412-329C-4B49-9AA6-CC2C05FE17E7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CompressionDemo", "CompressionDemo", "{BBB89FFD-7A5D-4178-8162-93215E66941B}"
+	ProjectSection(SolutionItems) = preProject
+		2013.08.August\CompressionDemo\readme.txt = 2013.08.August\CompressionDemo\readme.txt
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2013-12 December", "2013-12 December", "{7A2986BC-50E0-4A0C-82AE-279DCD54E907}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "RaspberryPi-PWM", "RaspberryPi-PWM", "{C2C5E980-75D7-4889-9576-6666967BE8F8}"
+	ProjectSection(SolutionItems) = preProject
+		2013.12.December\RaspberryPi-PWM\RaspberryPi-PWM.md = 2013.12.December\RaspberryPi-PWM\RaspberryPi-PWM.md
 	EndProjectSection
 EndProject
 Global
@@ -155,5 +169,7 @@ Global
 		{1D2AC5B4-0C2B-4663-A8B8-32A4102E4A2D} = {93F18427-A26A-407F-9D22-0283597443FF}
 		{ED4ADF3C-E284-4CE3-8946-125BA60EEE80} = {93F18427-A26A-407F-9D22-0283597443FF}
 		{A7A8E8A4-528C-4C48-A3C8-74340F1549A7} = {93F18427-A26A-407F-9D22-0283597443FF}
+		{BBB89FFD-7A5D-4178-8162-93215E66941B} = {0B684412-329C-4B49-9AA6-CC2C05FE17E7}
+		{C2C5E980-75D7-4889-9576-6666967BE8F8} = {7A2986BC-50E0-4A0C-82AE-279DCD54E907}
 	EndGlobalSection
 EndGlobal
