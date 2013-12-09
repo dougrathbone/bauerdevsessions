@@ -1,0 +1,23 @@
+﻿@{
+    ViewBag.Title = "GiftRequest";
+}
+
+<script type="text/javascript" src="~/Scripts/angular.js"></script>
+<script type="text/javascript" src="~/Scripts/angular-resource.js"></script>
+<script type="text/javascript" src="~/Scripts/apps/gift-request/gift-request.js"></script>
+
+<h3>Request for gift</h3>
+<div ng-app="giftRequest">
+    <div ng-controller="GiftRequestController">
+        <form ng-submit="submitGiftRequest()">
+            <input type="text" ng-model="firstName" placeholder="First Name" required/><br />
+            <input type="text" ng-model="lastName" placeholder="Last Name" required/><br />
+            <span>What would you like:</span><br />
+            <select ng-model="gift" ng-options="gift.Name for gift in gifts" required></select>
+            <div id="gift-request-details">
+                <h3>Hi Santa {{firstName + " " + lastName + " wants " + gift.Name}}!</h3>
+            </div>
+            <button type="submit">Request</button>
+        </form>
+    </div>
+</div>
