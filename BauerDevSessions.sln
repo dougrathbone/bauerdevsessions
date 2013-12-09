@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2013-03 March", "2013-03 March", "{AF0024DC-1391-4B36-9B3A-366CFBE8AC39}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "2013.March.Data", "2013.March.Data\2013.March.Data.csproj", "{8A2700ED-DAD7-42E1-B4FA-2B873A8EA87C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "2013.March.Data", "2013.03.March\EFCodeFirst\2013.March.Data\2013.March.Data.csproj", "{8A2700ED-DAD7-42E1-B4FA-2B873A8EA87C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "2013.March.Tests", "2013.March.Tests\2013.March.Tests.csproj", "{174ECAC1-D805-4F7D-9947-8FEDE6D5797C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "2013.March.Tests", "2013.03.March\MicrosoftFakes\2013.March.Tests\2013.March.Tests.csproj", "{174ECAC1-D805-4F7D-9947-8FEDE6D5797C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "2013.March.Domain", "2013.March.Domain\2013.March.Domain.csproj", "{DE0AA68F-D0A4-44E4-9B11-1D75A78B40E8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "2013.March.Domain", "2013.03.March\EFCodeFirst\2013.March.Domain\2013.March.Domain.csproj", "{DE0AA68F-D0A4-44E4-9B11-1D75A78B40E8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "2013.March.RunMe", "2013.March.RunMe\2013.March.RunMe.csproj", "{144E041C-4417-4E85-BC42-47F794FA89C0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "2013.March.RunMe", "2013.03.March\EFCodeFirst\2013.March.RunMe\2013.March.RunMe.csproj", "{144E041C-4417-4E85-BC42-47F794FA89C0}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EF Code First", "EF Code First", "{7248CFEA-804B-4B97-BF8D-9DCF1EE36E5D}"
 EndProject
